@@ -38,6 +38,14 @@ const OtpInput: React.FC<OtpInputProps> = ({
     index: number,
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
+    if (e.key === "Enter") {
+      const form = e.currentTarget.closest("form");
+      if (form) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+      return;
+    }
     if (e.key === "Backspace") {
       // If current input is empty, move to previous input
       if (!otp[index] && index > 0) {
@@ -70,6 +78,7 @@ const OtpInput: React.FC<OtpInputProps> = ({
         </p>
         <p className="text-sm font-medium text-blue-400 mb-3">{email}</p>
         <button
+          type="button"
           onClick={() => {
             handleStep(1);
             handleOtpChange("");
@@ -142,6 +151,7 @@ const OtpInput: React.FC<OtpInputProps> = ({
       {/* Resend OTP button */}
       <div className="mt-4 text-center">
         <button
+          type="button"
           className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
           onClick={() => {
             // Add resend OTP logic here

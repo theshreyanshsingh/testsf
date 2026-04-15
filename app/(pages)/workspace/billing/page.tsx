@@ -9,7 +9,7 @@ import PricingModal from "@/app/(pages)/_modals/PricingModal";
 import { useDispatch } from "react-redux";
 import { setPricingModalOpen } from "@/app/redux/reducers/basicData";
 import { setNotification } from "@/app/redux/reducers/NotificationModalReducer";
-import { LuChevronDown, LuLoaderCircle } from "react-icons/lu";
+import { LuLoaderCircle } from "react-icons/lu";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
 
@@ -222,7 +222,7 @@ const BillingPageContent = () => {
             <div>
               <p className="text-xs font-medium text-white">Billing details</p>
               <p className="mt-1 text-xs text-[#a1a1aa]">
-                Email and customer ID for support.
+                Email for support.
               </p>
             </div>
             {(settings?.email || email.value) && (
@@ -247,14 +247,6 @@ const BillingPageContent = () => {
                 {settings?.email || email.value || "—"}
               </span>
             </div>
-            <div className="flex flex-wrap justify-between gap-2">
-              <span className="text-[#71717a]">Stripe customer ID</span>
-              <span className="break-all text-right text-white">
-                {settings?.stripeCustomerId
-                  ? `${settings.stripeCustomerId.slice(0, 10)}…${settings.stripeCustomerId.slice(-4)}`
-                  : "Not available yet"}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -277,52 +269,54 @@ const BillingPageContent = () => {
           </div>
         </div>
 
-        <div className={card}>
-          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs font-medium text-white">Invoices</p>
-            <button
-              type="button"
-              className={`${btnOutline} border-[#3f3f46]`}
-            >
-              {moment().format("MMMM YYYY")}
-              <LuChevronDown className="h-3 w-3" />
-            </button>
+        {/*
+          <div className={card}>
+            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs font-medium text-white">Invoices</p>
+              <button
+                type="button"
+                className={`${btnOutline} border-[#3f3f46]`}
+              >
+                {moment().format("MMMM YYYY")}
+                <LuChevronDown className="h-3 w-3" />
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px] border-collapse text-left text-xs">
+                <thead className="sticky top-0 z-[1] bg-[#141414]">
+                  <tr className="border-b border-[#27272a] text-[#71717a]">
+                    <th className="whitespace-nowrap py-2 pr-3 font-medium">
+                      Date
+                    </th>
+                    <th className="whitespace-nowrap py-2 pr-3 font-medium">
+                      Description
+                    </th>
+                    <th className="whitespace-nowrap py-2 pr-3 font-medium">
+                      Status
+                    </th>
+                    <th className="whitespace-nowrap py-2 pr-3 font-medium">
+                      Amount
+                    </th>
+                    <th className="whitespace-nowrap py-2 text-right font-medium">
+                      Invoice
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="text-[#a1a1aa]">
+                    <td colSpan={5} className="py-6 text-center text-xs">
+                      No invoices yet.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-3 flex justify-end border-t border-[#27272a] pt-3">
+              <span className="text-xs text-[#a1a1aa]">Subtotal:</span>
+              <span className="ml-2 text-xs text-white">$0.00</span>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] border-collapse text-left text-xs">
-              <thead className="sticky top-0 z-[1] bg-[#141414]">
-                <tr className="border-b border-[#27272a] text-[#71717a]">
-                  <th className="whitespace-nowrap py-2 pr-3 font-medium">
-                    Date
-                  </th>
-                  <th className="whitespace-nowrap py-2 pr-3 font-medium">
-                    Description
-                  </th>
-                  <th className="whitespace-nowrap py-2 pr-3 font-medium">
-                    Status
-                  </th>
-                  <th className="whitespace-nowrap py-2 pr-3 font-medium">
-                    Amount
-                  </th>
-                  <th className="whitespace-nowrap py-2 text-right font-medium">
-                    Invoice
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="text-[#a1a1aa]">
-                  <td colSpan={5} className="py-6 text-center text-xs">
-                    No invoices yet.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-3 flex justify-end border-t border-[#27272a] pt-3">
-            <span className="text-xs text-[#a1a1aa]">Subtotal:</span>
-            <span className="ml-2 text-xs text-white">$0.00</span>
-          </div>
-        </div>
+        */}
       </div>
     </div>
   );

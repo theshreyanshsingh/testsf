@@ -67,7 +67,7 @@ import {
   setPricingModalOpen,
 } from "../redux/reducers/basicData";
 import { useAuthenticated } from "../helpers/useAuthenticated";
-import { LuLoaderCircle } from "react-icons/lu";
+import { LuLayoutTemplate, LuLoaderCircle } from "react-icons/lu";
 import { CgFigma } from "react-icons/cg";
 
 // import { setGenerating } from "../redux/reducers/projectOptions";
@@ -1487,7 +1487,7 @@ const Hero = () => {
           className="relative mb-2 flex w-full max-w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-[#2a2a2b] bg-stone-50/10 px-2.5 py-1.5 text-white backdrop-blur-3xl max-md:mt-4 sm:w-auto sm:justify-center sm:rounded-3xl sm:px-2 sm:py-1"
         >
           <div className="flex min-w-0 items-center gap-2">
-            <CiMobile1 className="shrink-0 text-base text-[#4F92E1] sm:text-lg" />
+            <LuLayoutTemplate className="shrink-0 text-base text-[#4F92E1] sm:text-lg" />
             <span
               className="relative min-w-0 truncate whitespace-nowrap bg-gradient-to-r from-transparent via-white to-transparent bg-clip-text text-[11px] text-transparent animate-shimmer sm:text-sm"
               style={{
@@ -1499,21 +1499,21 @@ const Hero = () => {
                 color: "transparent",
               }}
             >
-              <span className="sm:hidden">Mobile apps in Superblocks.</span>
+              <span className="sm:hidden">Community templates.</span>
               <span className="hidden sm:inline">
-                Introducing mobile apps with Superblocks.
+                Discover community templates with Superblocks.
               </span>
             </span>
           </div>
           <button
             type="button"
             onClick={() => {
-              setLandingPreview("mobile");
               setPreviewDropdownOpen(false);
+              router.push("/templates");
             }}
             className="shrink-0 cursor-pointer rounded-2xl bg-white px-3 py-1.5 text-[11px] font-medium text-[#000] sm:ml-1 sm:px-2 sm:py-1 sm:text-sm"
           >
-            <span className="sm:hidden">Try mobile</span>
+            <span className="sm:hidden">Browse</span>
             <span className="hidden sm:inline">Give it a shot!</span>
           </button>
         </motion.div>
