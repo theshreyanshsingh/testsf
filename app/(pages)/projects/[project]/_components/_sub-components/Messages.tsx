@@ -1802,9 +1802,10 @@ const Messages = () => {
                               {userDisplayText ? (
                                 <CollapsibleUserPromptText
                                   text={userDisplayText}
-                                  reserveRightForRestore={!!codeInfo?.id}
+                                  reserveRightForRestore={false}
                                 />
                               ) : null}
+                              {/* Restore button hidden for now
                               {codeInfo?.id ? (
                                 <button
                                   type="button"
@@ -1840,6 +1841,7 @@ const Messages = () => {
                                   )}
                                 </button>
                               ) : null}
+                              */}
                             </div>
                           )}
                           <div

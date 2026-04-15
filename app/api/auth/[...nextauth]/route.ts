@@ -4,6 +4,16 @@ import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { API } from "@/app/config/publicEnv";
+
+// NextAuth derives useSecureCookies from NEXTAUTH_URL protocol.
+// In dev the app runs on http://localhost but NEXTAUTH_URL points to the
+// production https:// domain, causing Safari to reject the Secure cookies
+// that NextAuth sets internally (Chrome tolerates this on localhost, Safari
+// does not). Override so NextAuth uses plain http cookies in development.
+if (process.env.NODE_ENV !== "production") {
+  process.env.NEXTAUTH_URL = `http://localhost:${process.env.PORT || 3000}`;
+}
+
 interface SessionUser {
   id?: string;
   name?: string | null | undefined;
@@ -14,8 +24,6 @@ interface SessionUser {
 }
 
 const handler = NextAuth({
-  // Set the base URL for NextAuth
-  ...(process.env.NEXTAUTH_URL && { url: process.env.NEXTAUTH_URL }),
   providers: [
     GithubProvider({
       clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || "",
@@ -64,6 +72,7 @@ const handler = NextAuth({
       },
     }),
   ],
+  debug: process.env.NODE_ENV !== "production",
   secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account }) {
@@ -101,6 +110,8 @@ const handler = NextAuth({
     async jwt({ token, user, account }) {
       if (user) {
         token.userId = user.id;
+        token.plan = (user as SessionUser).plan;
+        token.sessionId = (user as SessionUser).sessionId;
       }
 
       if (
@@ -138,6 +149,44 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    csrfToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Host-next-auth.csrf-token"
+          : "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    callbackUrl: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.callback-url"
+          : "next-auth.callback-url",
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 });
 

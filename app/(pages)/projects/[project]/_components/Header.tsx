@@ -315,32 +315,30 @@ const Header: NextPage = () => {
       />
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         <button
+          type="button"
           onClick={() => {
             window.location.href = "/";
           }}
-          className="hidden shrink-0 cursor-pointer text-sm font-[insSerifIt] font-semibold tracking-tight text-white sm:block"
+          className="shrink-0 cursor-pointer text-sm font-[insSerifIt] font-semibold tracking-tight text-white"
         >
           Superblocks
         </button>
 
-        {/* Title */}
+        {/* Project title: desktop/tablet only — on mobile the bar shows Superblocks only */}
         {title ? (
-          <>
-            <span className="text-sm  hidden sm:block text-gray-500">
-              {"/"}
-            </span>
+          <div className="hidden min-w-0 items-center sm:flex">
+            <span className="text-sm text-gray-500">/</span>
             <h3 className="ml-1 max-w-full truncate whitespace-nowrap text-xs font-sans font-medium text-white md:text-sm">
               {title}
             </h3>
             {startingPointLabel && (
-              <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full border border-[#2a2a2b] text-[#a0a0a8] hidden sm:inline-flex">
+              <span className="ml-2 inline-flex rounded-full border border-[#2a2a2b] px-2 py-0.5 text-[10px] text-[#a0a0a8]">
                 {startingPointLabel}
               </span>
             )}
-          </>
+          </div>
         ) : (
-          <h3 className="ml-1 max-w-full truncate whitespace-nowrap text-xs font-sans font-medium text-[#a0a0a8] md:text-sm">
-          </h3>
+          <h3 className="ml-1 hidden max-w-full truncate whitespace-nowrap text-xs font-sans font-medium text-[#a0a0a8] sm:block md:text-sm" />
         )}
       </div>
 

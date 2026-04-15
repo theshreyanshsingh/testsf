@@ -38,8 +38,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  turbopack: {},
   webpack(config) {
-    // Allow importing .html files as raw strings
     config.module.rules.push({
       test: /\.html$/i,
       type: "asset/source",

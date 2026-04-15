@@ -142,6 +142,34 @@ const ProfilePageContent = () => {
         </div>
 
         <div className="rounded-md border border-[#2a2a2b]/80 bg-[#141415]/80 p-4 backdrop-blur-sm">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h3 className="text-xs font-semibold text-white">Messages</h3>
+            {!settingsLoading && (
+              <p className="text-[10px] tabular-nums text-[#9E9D9F]">
+                {formatNumber(settings?.promptsUsed ?? 0)} / {formatNumber(settings?.maxPrompts ?? 0)} used
+              </p>
+            )}
+          </div>
+          {settingsLoading ? (
+            <div className="h-2 w-full animate-pulse rounded-full bg-[#272628]" />
+          ) : (
+            <>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[#252528]">
+                <div
+                  className="h-full rounded-full bg-[#4a90e2] transition-all duration-500"
+                  style={{
+                    width: `${Math.min(100, ((settings?.promptsUsed ?? 0) / Math.max(settings?.maxPrompts ?? 1, 1)) * 100)}%`,
+                  }}
+                />
+              </div>
+              <p className="mt-2 text-[10px] tabular-nums text-[#6b6b70]">
+                {formatNumber(settings?.remainingPrompts ?? 0)} remaining this period
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="rounded-md border border-[#2a2a2b]/80 bg-[#141415]/80 p-4 backdrop-blur-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <h3 className="text-xs font-semibold text-white">

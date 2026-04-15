@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "bun scripts/run-next.js dev",
-        "build": "bun scripts/run-next.js build",
+        "build": "node scripts/run-next.js build",
         "start": "next start",
         "lint": "eslint ."
     },

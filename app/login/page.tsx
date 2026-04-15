@@ -39,6 +39,7 @@ const HeroSection: FC = () => {
             modalOpen: true,
           })
         );
+        setIsLoading(false);
         return;
       }
 
@@ -55,45 +56,56 @@ const HeroSection: FC = () => {
         );
       }
     } else if (step === 2) {
-      const result = await signIn("credentials", {
-        email,
-        otp,
-        redirect: false,
-      });
-
-      if (result?.ok) {
-        const projectId = sessionStorage.getItem("projectId");
-        const params =
-          typeof window !== "undefined"
-            ? new URLSearchParams(window.location.search)
-            : null;
-        const callbackUrl = params?.get("callbackUrl");
-        const safeCallback =
-          callbackUrl &&
-          (callbackUrl.startsWith("/projects") ||
-            callbackUrl.startsWith("/workspace")) &&
-          !callbackUrl.startsWith("//")
-            ? callbackUrl
-            : null;
-
-        unstable_batchedUpdates(() => {
-          setStep(1);
-          setOtp("");
-          setEmail("");
+      try {
+        const result = await signIn("credentials", {
+          email,
+          otp,
+          redirect: false,
         });
 
-        if (safeCallback) {
-          router.push(safeCallback);
-        } else if (projectId) {
-          router.push(`/projects/${projectId}`);
+        if (result?.ok) {
+          const projectId = sessionStorage.getItem("projectId");
+          const params =
+            typeof window !== "undefined"
+              ? new URLSearchParams(window.location.search)
+              : null;
+          const callbackUrl = params?.get("callbackUrl");
+          const safeCallback =
+            callbackUrl &&
+            (callbackUrl.startsWith("/projects") ||
+              callbackUrl.startsWith("/workspace")) &&
+            !callbackUrl.startsWith("//")
+              ? callbackUrl
+              : null;
+
+          unstable_batchedUpdates(() => {
+            setStep(1);
+            setOtp("");
+            setEmail("");
+          });
+
+          if (safeCallback) {
+            window.location.href = safeCallback;
+          } else if (projectId) {
+            window.location.href = `/projects/${projectId}`;
+          } else {
+            window.location.href = "/";
+          }
         } else {
-          router.push("/");
+          dispatch(
+            setNotification({
+              status: "error",
+              text: "Invalid OTP or session expired. Please try again.",
+              modalOpen: true,
+            })
+          );
         }
-      } else {
+      } catch (err) {
+        console.error("[login] signIn error:", err);
         dispatch(
           setNotification({
             status: "error",
-            text: "something went wrong!",
+            text: "Login failed. Please try again.",
             modalOpen: true,
           })
         );

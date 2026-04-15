@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
+import { RootState } from "@/app/redux/store";
 import {
   SB_COMPOSER_PREFILL,
   SB_PREVIEW_RUNTIME_ERROR,
@@ -19,6 +21,9 @@ type Props = {
  * with Try fixing (one click: sends agent fix request) and Hide.
  */
 const PreviewRuntimeErrorBar = ({ enabled }: Props) => {
+  const isStreamActive = useSelector(
+    (state: RootState) => state.projectOptions.isStreamActive === true,
+  );
   const [detail, setDetail] = useState<PreviewRuntimeErrorDetail | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -39,7 +44,7 @@ const PreviewRuntimeErrorBar = ({ enabled }: Props) => {
   }, []);
 
   const tryFix = useCallback(() => {
-    if (!detail) return;
+    if (isStreamActive || !detail) return;
     const text = buildTryFixPrompt(detail);
     window.dispatchEvent(
       new CustomEvent(SB_COMPOSER_PREFILL, {
@@ -47,7 +52,7 @@ const PreviewRuntimeErrorBar = ({ enabled }: Props) => {
       }),
     );
     setOpen(false);
-  }, [detail]);
+  }, [detail, isStreamActive]);
 
   if (!enabled || !open || !detail) return null;
 
@@ -78,8 +83,9 @@ const PreviewRuntimeErrorBar = ({ enabled }: Props) => {
           </button>
           <button
             type="button"
+            disabled={isStreamActive}
             onClick={tryFix}
-            className="rounded-lg border border-[#4a90e2]/50 bg-[#4a90e2] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5ba0f2]"
+            className="rounded-lg border border-[#4a90e2]/50 bg-[#4a90e2] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5ba0f2] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#4a90e2]"
           >
             Try fixing
           </button>
