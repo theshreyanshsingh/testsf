@@ -51,11 +51,15 @@ const Keyboard: NextPage = () => {
   const { email } = useAuthenticated();
   const [attachments, setAttachments] = useState<AttachmentType[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const allowedModels = new Set(["claude-opus-4.6", "claude-sonnet-4.6"]);
+  const allowedModels = new Set(["claude-opus-4.7", "claude-sonnet-4.6"]);
   const [selectedModel, setSelectedModel] = useState(() => {
     if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("model");
-      if (stored && allowedModels.has(stored)) return stored;
+      const raw = sessionStorage.getItem("model");
+      if (raw === "claude-opus-4.6") {
+        sessionStorage.setItem("model", "claude-opus-4.7");
+        return "claude-opus-4.7";
+      }
+      if (raw && allowedModels.has(raw)) return raw;
       return "claude-sonnet-4.6";
     }
     return "claude-sonnet-4.6";
@@ -64,6 +68,9 @@ const Keyboard: NextPage = () => {
   const modelDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+
+  /** Matches textarea max-h-[150px] — cap auto-resize so content scrolls inside. */
+  const TEXTAREA_MAX_PX = 150;
 
   const path = usePathname();
 
@@ -86,7 +93,7 @@ const Keyboard: NextPage = () => {
   const { data: settingsData } = useSettings();
 
   const modelOptions = [
-    { name: "claude-opus-4.6", display: "Claude Opus 4.6", scale: false },
+    { name: "claude-opus-4.7", display: "Claude Opus 4.7", scale: false },
     { name: "claude-sonnet-4.6", display: "Claude Sonnet 4.6", scale: false },
   ];
 
@@ -358,7 +365,11 @@ const Keyboard: NextPage = () => {
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "40px";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      const h = Math.min(
+        textareaRef.current.scrollHeight,
+        TEXTAREA_MAX_PX,
+      );
+      textareaRef.current.style.height = `${Math.max(h, 40)}px`;
     }
   };
 
@@ -574,11 +585,11 @@ const Keyboard: NextPage = () => {
         )}
       </AnimatePresence>
       {/* Main Input Container — Meteors clipped here so they never cover Messages above */}
-      <div className="relative flex min-h-[120px] w-full flex-col items-start justify-center overflow-hidden rounded-lg shadow-lg">
+      <div className="relative flex min-h-[120px] w-full flex-col items-start justify-center overflow-x-hidden rounded-lg shadow-lg">
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-lg">
           <Meteors number={5} />
         </div>
-        <div className="relative z-10 flex w-full min-w-0 flex-col">
+        <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-col">
         {/* Attachment Preview */}
         <AttachmentPreview
           attachments={attachments}
@@ -613,7 +624,7 @@ const Keyboard: NextPage = () => {
           maxLength={10000}
           // disabled={(promptCount as number) < 1}
           ref={textareaRef}
-          className="flex-1 bg-transparent outline-none text-white w-full p-1 text-sm resize-none overflow-y-auto rounded-lg min-h-[60px] max-h-[150px]"
+          className="min-h-[60px] max-h-[150px] w-full flex-1 resize-none overflow-y-auto rounded-lg bg-transparent p-1 text-sm text-white outline-none"
           placeholder="Ask Agent to change anything..."
           value={message}
           onChange={(e) => {

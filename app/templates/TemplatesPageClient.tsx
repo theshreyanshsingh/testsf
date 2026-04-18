@@ -10,6 +10,7 @@ import {
   IoPhonePortraitOutline,
   IoStatsChartOutline,
 } from "react-icons/io5";
+import { LuLoaderCircle } from "react-icons/lu";
 
 import Header from "@/app/_components/Header";
 import NavigationBanner from "@/app/_components/NavigationBanner";
@@ -57,7 +58,9 @@ export default function TemplatesPageClient({
   const [selectedCategory, setSelectedCategory] =
     useState<"All" | TemplateCategory>("All");
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-  const [communityRows, setCommunityRows] = useState<TemplateDefinition[]>([]);
+  const [communityRows, setCommunityRows] = useState<
+    TemplateDefinition[] | null
+  >(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -67,10 +70,16 @@ export default function TemplatesPageClient({
         cancelled = true;
       };
     }
-    void fetchPublicTemplates().then((rows) => {
-      if (cancelled) return;
-      setCommunityRows(rows.map(communityDtoToTemplateDefinition));
-    });
+    setCommunityRows(null);
+    void fetchPublicTemplates()
+      .then((rows) => {
+        if (cancelled) return;
+        setCommunityRows(rows.map(communityDtoToTemplateDefinition));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCommunityRows([]);
+      });
     return () => {
       cancelled = true;
     };
@@ -80,7 +89,7 @@ export default function TemplatesPageClient({
     if (initialRuntime === "mobile") {
       return [] as TemplateDefinition[];
     }
-    return communityRows;
+    return communityRows ?? [];
   }, [initialRuntime, communityRows]);
 
   const availableCategories = useMemo(() => {
@@ -151,7 +160,11 @@ export default function TemplatesPageClient({
             ))}
           </div>
 
-          {visibleTemplates.length ? (
+          {initialRuntime !== "mobile" && communityRows === null ? (
+            <div className="flex justify-center py-16">
+              <LuLoaderCircle className="h-8 w-8 animate-spin text-[#4a90e2]" />
+            </div>
+          ) : visibleTemplates.length ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {visibleTemplates.map((template) => (
                 <TemplateCard

@@ -41,20 +41,17 @@ const MobileChat = () => {
         )}
       </div>
       {MobileChatOpen && (
-        <div className="flex flex-col h-[70vh] w-screen bg-[#141415] border-l border-[#201F22]">
-          {/* Head */}
-
-          {/* Palette / Messages */}
-          <div className="flex-1 overflow-y-auto scrollbar-hide">
-            <div className="h-full">
+        <div className="flex h-[70vh] min-h-0 w-screen flex-col overflow-x-hidden overflow-y-hidden border-l border-[#201F22] bg-[#141415]">
+          {/* Palette / Messages — mirror desktop Chat wrappers so Messages manages its own scroll */}
+          <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-hidden break-words scrollbar-hide">
+            <div className="flex h-full min-h-0 flex-1 flex-col break-words">
               <Messages />
             </div>
           </div>
 
           {/* Input Keyboard */}
-
-          <div className=" justify-center items-center flex flex-col ">
-            <div className="p-3 border-y border-[#201F22] bg-[#1a1a1b] w-full">
+          <div className="flex w-full flex-col items-center justify-center">
+            <div className="w-full overflow-x-hidden border-y border-[#201F22] bg-[#1a1a1b] p-3">
               <Keyboard />
             </div>
           </div>

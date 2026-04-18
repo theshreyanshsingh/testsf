@@ -68,6 +68,7 @@ import {
 } from "../redux/reducers/basicData";
 import { useAuthenticated } from "../helpers/useAuthenticated";
 import { LuLayoutTemplate, LuLoaderCircle } from "react-icons/lu";
+import { SiAnthropic } from "react-icons/si";
 import { CgFigma } from "react-icons/cg";
 
 // import { setGenerating } from "../redux/reducers/projectOptions";
@@ -308,13 +309,15 @@ const Hero = () => {
   const [framework] = useState("React");
   const [cssLibrary] = useState("Tailwind CSS");
   const [memory] = useState("");
-  const allowedModels = new Set(["claude-opus-4.6", "claude-sonnet-4.6"]);
+  const allowedModels = new Set(["claude-opus-4.7", "claude-sonnet-4.6"]);
   const [selectedModel, setSelectedModel] = useState(() => {
     if (typeof window === "undefined") return "claude-sonnet-4.6";
-    const stored = sessionStorage.getItem("model");
-    return stored && allowedModels.has(stored)
-      ? stored
-      : "claude-sonnet-4.6";
+    const raw = sessionStorage.getItem("model");
+    if (raw === "claude-opus-4.6") {
+      sessionStorage.setItem("model", "claude-opus-4.7");
+      return "claude-opus-4.7";
+    }
+    return raw && allowedModels.has(raw) ? raw : "claude-sonnet-4.6";
   });
   const [selectedStartingPoint, setSelectedStartingPoint] =
     useState<StartingPoint | null>(null);
@@ -325,8 +328,8 @@ const Hero = () => {
     "web"
   );
   const [communityWebTemplates, setCommunityWebTemplates] = useState<
-    TemplateDefinition[]
-  >([]);
+    TemplateDefinition[] | null
+  >(null);
 
   useEffect(() => {
     if (landingPreview !== "web") {
@@ -334,10 +337,16 @@ const Hero = () => {
       return;
     }
     let cancelled = false;
-    void fetchPublicTemplates().then((rows) => {
-      if (cancelled) return;
-      setCommunityWebTemplates(rows.map(communityDtoToTemplateDefinition));
-    });
+    setCommunityWebTemplates(null);
+    void fetchPublicTemplates()
+      .then((rows) => {
+        if (cancelled) return;
+        setCommunityWebTemplates(rows.map(communityDtoToTemplateDefinition));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCommunityWebTemplates([]);
+      });
     return () => {
       cancelled = true;
     };
@@ -509,7 +518,7 @@ const Hero = () => {
     if (landingPreview === "mobile") {
       return [];
     }
-    return communityWebTemplates;
+    return communityWebTemplates ?? [];
   }, [landingPreview, communityWebTemplates]);
 
   const templateCategoryOptions = useMemo(
@@ -613,7 +622,7 @@ const Hero = () => {
   );
 
   const modelOptions = [
-    { name: "claude-opus-4.6", display: "Claude Opus 4.6", scale: false },
+    { name: "claude-opus-4.7", display: "Claude Opus 4.7", scale: false },
     { name: "claude-sonnet-4.6", display: "Claude Sonnet 4.6", scale: false },
   ];
   const selectedModelOption = modelOptions.find(
@@ -1487,7 +1496,10 @@ const Hero = () => {
           className="relative mb-2 flex w-full max-w-full items-center justify-between gap-2 overflow-hidden rounded-2xl border border-[#2a2a2b] bg-stone-50/10 px-2.5 py-1.5 text-white backdrop-blur-3xl max-md:mt-4 sm:w-auto sm:justify-center sm:rounded-3xl sm:px-2 sm:py-1"
         >
           <div className="flex min-w-0 items-center gap-2">
-            <LuLayoutTemplate className="shrink-0 text-base text-[#4F92E1] sm:text-lg" />
+            <SiAnthropic
+              aria-label="Anthropic"
+              className="shrink-0 text-base text-[#D97757] sm:text-lg"
+            />
             <span
               className="relative min-w-0 truncate whitespace-nowrap bg-gradient-to-r from-transparent via-white to-transparent bg-clip-text text-[11px] text-transparent animate-shimmer sm:text-sm"
               style={{
@@ -1499,21 +1511,24 @@ const Hero = () => {
                 color: "transparent",
               }}
             >
-              <span className="sm:hidden">Community templates.</span>
+              <span className="sm:hidden">Opus 4.7 is here!</span>
               <span className="hidden sm:inline">
-                Discover community templates with Superblocks.
+                Opus 4.7 is here!
               </span>
             </span>
           </div>
           <button
             type="button"
             onClick={() => {
-              setPreviewDropdownOpen(false);
-              router.push("/templates");
+              setSelectedModel("claude-opus-4.7");
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem("model", "claude-opus-4.7");
+              }
+              setModelDropdownOpen(false);
             }}
             className="shrink-0 cursor-pointer rounded-2xl bg-white px-3 py-1.5 text-[11px] font-medium text-[#000] sm:ml-1 sm:px-2 sm:py-1 sm:text-sm"
           >
-            <span className="sm:hidden">Browse</span>
+            <span className="sm:hidden">Try it</span>
             <span className="hidden sm:inline">Give it a shot!</span>
           </button>
         </motion.div>
@@ -1568,7 +1583,7 @@ const Hero = () => {
             </motion.button>
           )}
           {/*  TEXT INPUT (FIRST) */}
-          <div className="bg-[#141415] relative rounded-xl p-4 flex flex-col items-start justify-center shadow-lg sm:min-h-[120px] md:min-h-[180px] max-h-[200px] w-full">
+          <div className="bg-[#141415] relative flex min-h-0 max-h-[200px] w-full flex-col items-start justify-center rounded-xl p-4 shadow-lg sm:min-h-[120px] md:min-h-[180px]">
             <BorderBeam
               duration={6}
               delay={3}
@@ -1585,7 +1600,7 @@ const Hero = () => {
             <textarea
               maxLength={10000}
               placeholder={placeholder}
-              className="flex-1 bg-transparent text-white outline-none text-sm resize-none w-full min-h-[100px] max-h-[250px] overflow-hidden scrollbar-none"
+              className="w-full min-h-[100px] max-h-[250px] flex-1 resize-none overflow-y-auto bg-transparent text-sm text-white outline-none"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={4}
@@ -2038,7 +2053,11 @@ const Hero = () => {
               </div>
             </div>
 
-            {visibleLandingTemplates.length > 0 ? (
+            {landingPreview === "web" && communityWebTemplates === null ? (
+              <div className="flex justify-center py-10">
+                <LuLoaderCircle className="h-8 w-8 animate-spin text-[#4a90e2]" />
+              </div>
+            ) : visibleLandingTemplates.length > 0 ? (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {visibleLandingTemplates.map((template) => (
                   <div key={template.slug} className="min-w-0">
